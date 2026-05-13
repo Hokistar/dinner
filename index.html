@@ -20,14 +20,19 @@
   <h1>🍽️ Dinner Order Lookup</h1>
   <p class="sub">Type your name (or part of it) — or enter your table number.</p>
 
-  <div class="row">
-    <input id="q" placeholder="e.g., Ashley or 7" size="28"/>
-    <select id="date">
-      <option value="">Both days</option>
-      <option value="19th May 2026">19th May 2026</option>
-      <option value="20th May 2026">20th May 2026</option>
-    </select>
-  </div>
+<div class="row">
+  <input id="q" placeholder="e.g., Ashley or 7" size="28"/>
+  <select id="date">
+    <option value="">Both days</option>
+    <option value="19th May 2026">19th May 2026</option>
+    <option value="20th May 2026">20th May 2026</option>
+  </select>
+
+  <button id="searchBtn" style="padding:10px 14px;font-size:16px;">Search</button>
+  <button id="clearBtn" style="padding:10px 14px;font-size:16px;">Clear</button>
+</div>
+
+<div id="status" class="note"></div>
 
   <table>
     <thead>
@@ -41,10 +46,10 @@
 <script>
   const CSV_URL = "PublicOrders.csv";
   let rows = [];
+  let hasSearched = false; // <-- key privacy flag
 
   const norm = s => (s||"").toString().trim().toUpperCase();
 
-  // Robust CSV split (handles quoted commas)
   function splitCSVLine(line){
     const re = /,(?=(?:[^"]*"[^"]*")*[^"]*$)/g;
     return line.split(re).map(c => c.replace(/^"|"$/g,"").trim());
@@ -70,25 +75,59 @@
       };
     });
 
-    render();
+    // Do NOT render results on load — keep hidden
+    setStatus("Enter a name (min 2 letters) or a table number, then click Search.");
+    clearResults();
   }
 
-  function render(){
+  function setStatus(msg){
+    document.getElementById("status").textContent = msg || "";
+  }
+
+  function clearResults(){
+    document.getElementById("out").innerHTML = "";
+  }
+
+  function runSearch(){
+    hasSearched = true;
+
     const qRaw = document.getElementById("q").value.trim();
-    const q = norm(qRaw);
     const d = document.getElementById("date").value;
 
+    // Block empty searches (prevents full list exposure)
+    if (!qRaw){
+      setStatus("Please type a name or table number before searching.");
+      clearResults();
+      return;
+    }
+
+    // Table search if numeric-only
     const tableQuery = qRaw.match(/^\d+$/) ? qRaw : null;
+
+    // For name searches, require at least 2 characters (privacy + usability)
+    if (!tableQuery && qRaw.length < 2){
+      setStatus("Please type at least 2 letters of your name (or enter a table number).");
+      clearResults();
+      return;
+    }
+
+    const q = norm(qRaw);
 
     const filtered = rows.filter(r=>{
       const matchDate = !d || r.Date === d;
       const matchQuery =
-        !q ? true :
         tableQuery ? (r.Table === tableQuery) :
         r.NName.includes(q);
       return matchDate && matchQuery;
     }).slice(0,250);
 
+    if (filtered.length === 0){
+      setStatus("No matches found. Try a different spelling or just your table number.");
+      clearResults();
+      return;
+    }
+
+    setStatus(`Showing ${filtered.length} RESULT(s).`);
     const out = document.getElementById("out");
     out.innerHTML = filtered.map(r=>`
       <tr>
@@ -101,8 +140,25 @@
       </tr>`).join("");
   }
 
-  document.getElementById("q").addEventListener("input", render);
-  document.getElementById("date").addEventListener("change", render);
+  function clearSearch(){
+    document.getElementById("q").value = "";
+    document.getElementById("date").value = "";
+    hasSearched = false;
+    setStatus("Enter a name (min 2 letters) or a table number, then click Search.");
+    clearResults();
+  }
+
+  // Wire up buttons
+  document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("searchBtn").addEventListener("click", runSearch);
+    document.getElementById("clearBtn").addEventListener("click", clearSearch);
+
+    // Optional: Press Enter to search
+    document.getElementById("q").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") runSearch();
+    });
+  });
+
   loadCSV();
 </script>
 </body>
