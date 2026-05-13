@@ -1,290 +1,257 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dinner Order Lookup</title>
-  <style>
-    :root { --border:#ddd; --bg:#f6f6f6; --text:#222; --muted:#666; }
-    body{
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      margin: 24px;
-      max-width: 980px;
-      color: var(--text);
-    }
-    h1{ margin: 0 0 6px; font-size: 26px; }
-    .sub{ margin: 0 0 18px; color: var(--muted); }
-    .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin: 10px 0 14px; }
-    input, select, button{
-      padding: 10px 12px;
-      font-size: 16px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: #fff;
-    }
-    button{
-      cursor:pointer;
-      background: #111;
-      color: #fff;
-      border: 1px solid #111;
-    }
-    button.secondary{
-      background: #fff;
-      color: #111;
-      border: 1px solid var(--border);
-    }
-    button:disabled{
-      opacity: .5;
-      cursor: not-allowed;
-    }
-    #status{ color: var(--muted); font-size: 13px; margin: 6px 0 12px; min-height: 18px; }
-    table{
-      border-collapse: collapse;
-      width: 100%;
-      margin-top: 6px;
-    }
-    th, td{
-      border: 1px solid var(--border);
-      padding: 10px;
-      text-align: left;
-      vertical-align: top;
-      font-size: 14px;
-    }
-    th{ background: var(--bg); }
-    .pill{
-      display:inline-block;
-      padding: 2px 8px;
-      border-radius: 999px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      font-size: 12px;
-      color: var(--muted);
-    }
-    .hint{ margin-top: 10px; font-size: 12px; color: var(--muted); }
-    
-    .topbar{
-  display:flex;
-  align-items:center;
-  justify-content:flex-start;
-  margin-bottom: 14px;
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dinner Order Lookup</title>
+<style>
+:root { --border:#ddd; --bg:#f6f6f6; --text:#222; --muted:#666; }
+body{
+font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+margin: 24px;
+max-width: 980px;
+color: var(--text);
 }
-
-.logo{
-  height: 44px;          /* adjust size here */
-  width: auto;
+h1{ margin: 0 0 6px; font-size: 26px; }
+.sub{ margin: 0 0 18px; color: var(--muted); }
+.row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin: 10px 0 14px; }
+input, select, button{
+padding: 10px 12px;
+font-size: 16px;
+border: 1px solid var(--border);
+border-radius: 8px;
+background: #fff;
 }
-  </style>
+button{
+cursor:pointer;
+background: #111;
+color: #fff;
+border: 1px solid #111;
+}
+button.secondary{
+background: #fff;
+color: #111;
+border: 1px solid var(--border);
+}
+button:disabled{
+opacity: .5;
+cursor: not-allowed;
+}
+#status{ color: var(--muted); font-size: 13px; margin: 6px 0 12px; min-height: 18px; }
+table{
+border-collapse: collapse;
+width: 100%;
+margin-top: 6px;
+}
+th, td{
+border: 1px solid var(--border);
+padding: 10px;
+text-align: left;
+vertical-align: top;
+font-size: 14px;
+}
+th{ background: var(--bg); }
+.pill{
+display:inline-block;
+padding: 2px 8px;
+border-radius: 999px;
+background: var(--bg);
+border: 1px solid var(--border);
+font-size: 12px;
+color: var(--muted);
+}
+.hint{ margin-top: 10px; font-size: 12px; color: var(--muted); }
+</style>
 </head>
 
 <body>
-<header class="brand">
-  <img src="costa-logo.png" alt="Costa Coffee" class="logo">
-  <div>
-    <H1>🍽️ Dinner Order Lookup</H1>
-    <p class="sub">Search by <b>name</b> (2+ letters) or <b>table number</b>. Results only appear after you press Search.</p>
-  </div>
-</header>```
+<h1>🍽️ Dinner Order Lookup</h1>
+<p class="sub">Search by <b>name</b> (2+ letters) or <b>table number</b>. Results only appear after you press Search.</p>
 
-### And add this CSS:
-```css
-.brand{
-  display:flex;
-  gap:14px;
-  align-items:center;
-  margin-bottom: 10px;
-}
+<div class="row">
+<input id="q" placeholder="e.g., Ashley or 7" size="28" autocomplete="off" />
+<select id="date">
+<option value="">Both days</option>
+<option value="19th May 2026">19th May 2026</option>
+<option value="20th May 2026">20th May 2026</option>
+</select>
+<button id="searchBtn">Search</button>
+<button id="clearBtn" class="secondary">Clear</button>
+<span id="loadedBadge" class="pill" style="display:none;">Data loaded</span>
+</div>
 
-.logo{
-  height: 52px;
-  width:auto;
-}
-</header>
-  <h1>🍽️ Dinner Order Lookup</h1>
-  <p class="sub">Search by <b>name</b> (2+ letters) or <b>table number</b>. Results only appear after you press Search.</p>
+<div id="status">Loading data…</div>
 
-  <div class="row">
-    <input id="q" placeholder="e.g., Ashley or 7" size="28" autocomplete="off" />
-    <select id="date">
-      <option value="">Both days</option>
-      <option value="19th May 2026">19th May 2026</option>
-      <option value="20th May 2026">20th May 2026</option>
-    </select>
-    <button id="searchBtn">Search</button>
-    <button id="clearBtn" class="secondary">Clear</button>
-    <span id="loadedBadge" class="pill" style="display:none;">Data loaded</span>
-  </div>
+<!-- Results are hidden by default -->
+<table id="resultsTable" style="display:none;">
+<thead>
+<tr>
+<th style="width:140px;">Date</th>
+<th style="width:90px;">Table</th>
+<th style="width:220px;">Name</th>
+<th>Starter</th>
+<th>Main</th>
+<th>Dessert</th>
+</tr>
+</thead>
+<tbody id="out"></tbody>
+</table>
 
-  <div id="status">Loading data…</div>
-
-  <!-- Results are hidden by default -->
-  <table id="resultsTable" style="display:none;">
-    <thead>
-      <tr>
-        <th style="width:140px;">Date</th>
-        <th style="width:90px;">Table</th>
-        <th style="width:220px;">Name</th>
-        <th>Starter</th>
-        <th>Main</th>
-        <th>Dessert</th>
-      </tr>
-    </thead>
-    <tbody id="out"></tbody>
-  </table>
-
-  <div class="hint">
+<div class="hint">
+    Tip: If your name is hard to spell, try your <b>table number</b> instead.
     Tip: If you can't find your name, try your <b>table number</b> instead.
-  </div>
+</div>
 
 <script>
-  // Put PublicOrders.csv in the SAME folder as this index.html
-  const CSV_URL = "PublicOrders.csv";
-  let rows = [];
-  let isLoaded = false;
+// Put PublicOrders.csv in the SAME folder as this index.html
+const CSV_URL = "PublicOrders.csv";
+let rows = [];
+let isLoaded = false;
 
-  const el = (id) => document.getElementById(id);
-  const norm = (s) => (s || "").toString().trim().toUpperCase();
+const el = (id) => document.getElementById(id);
+const norm = (s) => (s || "").toString().trim().toUpperCase();
 
-  // Handles quoted commas properly:  a,"b,c",d
-  function splitCSVLine(line){
-    const re = /,(?=(?:[^"]*"[^"]*")*[^"]*$)/g;
-    return line.split(re).map(c => c.replace(/^\uFEFF/, "").replace(/^"|"$/g, "").trim());
-  }
+// Handles quoted commas properly:  a,"b,c",d
+function splitCSVLine(line){
+const re = /,(?=(?:[^"]*"[^"]*")*[^"]*$)/g;
+return line.split(re).map(c => c.replace(/^\uFEFF/, "").replace(/^"|"$/g, "").trim());
+}
 
-  function setStatus(msg){ el("status").textContent = msg || ""; }
+function setStatus(msg){ el("status").textContent = msg || ""; }
 
-  function hideResults(){
-    el("out").innerHTML = "";
-    el("resultsTable").style.display = "none";
-  }
+function hideResults(){
+el("out").innerHTML = "";
+el("resultsTable").style.display = "none";
+}
 
-  function showResults(html){
-    el("out").innerHTML = html;
-    el("resultsTable").style.display = "table";
-  }
+function showResults(html){
+el("out").innerHTML = html;
+el("resultsTable").style.display = "table";
+}
 
-  async function loadCSV(){
-    try {
-      const resp = await fetch(CSV_URL, { cache: "no-store" });
-      if (!resp.ok) throw new Error(`Could not load CSV (${resp.status})`);
-      const text = await resp.text();
+async function loadCSV(){
+try {
+const resp = await fetch(CSV_URL, { cache: "no-store" });
+if (!resp.ok) throw new Error(`Could not load CSV (${resp.status})`);
+const text = await resp.text();
 
-      const lines = text.split(/\r?\n/).filter(l => l.trim().length);
-      if (lines.length < 2) throw new Error("CSV appears empty");
+const lines = text.split(/\r?\n/).filter(l => l.trim().length);
+if (lines.length < 2) throw new Error("CSV appears empty");
 
-      const header = splitCSVLine(lines.shift());
-      const idx = Object.fromEntries(header.map((h,i)=>[h,i]));
+const header = splitCSVLine(lines.shift());
+const idx = Object.fromEntries(header.map((h,i)=>[h,i]));
 
-      // Expected headers
-      const required = ["Date","Table Number","Guest Name","Starter","Main Course","Dessert"];
-      const missing = required.filter(h => idx[h] === undefined);
-      if (missing.length) throw new Error("Missing CSV headers: " + missing.join(", "));
+// Expected headers
+const required = ["Date","Table Number","Guest Name","Starter","Main Course","Dessert"];
+const missing = required.filter(h => idx[h] === undefined);
+if (missing.length) throw new Error("Missing CSV headers: " + missing.join(", "));
 
-      rows = lines.map(line=>{
-        const cols = splitCSVLine(line);
-        const name = cols[idx["Guest Name"]] || "";
-        return {
-          Date: cols[idx["Date"]] || "",
-          Table: (cols[idx["Table Number"]] || "").trim(),
-          Name: name,
-          Starter: cols[idx["Starter"]] || "",
-          Main: cols[idx["Main Course"]] || "",
-          Dessert: cols[idx["Dessert"]] || "",
-          NName: norm(name)
-        };
-      });
+rows = lines.map(line=>{
+const cols = splitCSVLine(line);
+const name = cols[idx["Guest Name"]] || "";
+return {
+Date: cols[idx["Date"]] || "",
+Table: (cols[idx["Table Number"]] || "").trim(),
+Name: name,
+Starter: cols[idx["Starter"]] || "",
+Main: cols[idx["Main Course"]] || "",
+Dessert: cols[idx["Dessert"]] || "",
+NName: norm(name)
+};
+});
 
-      isLoaded = true;
-      el("loadedBadge").style.display = "inline-block";
-      setStatus("Enter a name (2+ letters) or table number, then press Search.");
-      hideResults();
-    } catch (err) {
-      setStatus("⚠️ Error loading data: " + err.message);
-      hideResults();
-      console.error(err);
-    }
-  }
+isLoaded = true;
+el("loadedBadge").style.display = "inline-block";
+setStatus("Enter a name (2+ letters) or table number, then press Search.");
+hideResults();
+} catch (err) {
+setStatus("⚠️ Error loading data: " + err.message);
+hideResults();
+console.error(err);
+}
+}
 
-  function runSearch(){
-    if (!isLoaded){
-      setStatus("Still loading data — please wait a moment and try again.");
-      return;
-    }
+function runSearch(){
+if (!isLoaded){
+setStatus("Still loading data — please wait a moment and try again.");
+return;
+}
 
-    const qRaw = el("q").value.trim();
-    const date = el("date").value;
+const qRaw = el("q").value.trim();
+const date = el("date").value;
 
-    // Block empty search to prevent accidental “show all”
-    if (!qRaw){
-      setStatus("Please type a name or table number before searching.");
-      hideResults();
-      return;
-    }
+// Block empty search to prevent accidental “show all”
+if (!qRaw){
+setStatus("Please type a name or table number before searching.");
+hideResults();
+return;
+}
 
-    const isTableSearch = /^\d+$/.test(qRaw);
-    if (!isTableSearch && qRaw.length < 2){
-      setStatus("Please type at least 2 letters of your name (or enter a table number).");
-      hideResults();
-      return;
-    }
+const isTableSearch = /^\d+$/.test(qRaw);
+if (!isTableSearch && qRaw.length < 2){
+setStatus("Please type at least 2 letters of your name (or enter a table number).");
+hideResults();
+return;
+}
 
-    const q = norm(qRaw);
+const q = norm(qRaw);
 
-    const filtered = rows.filter(r => {
-      const matchDate = !date || r.Date === date;
-      const matchQuery = isTableSearch ? (r.Table === qRaw) : r.NName.includes(q);
-      return matchDate && matchQuery;
-    }).slice(0, 200);
+const filtered = rows.filter(r => {
+const matchDate = !date || r.Date === date;
+const matchQuery = isTableSearch ? (r.Table === qRaw) : r.NName.includes(q);
+return matchDate && matchQuery;
+}).slice(0, 200);
 
-    if (filtered.length === 0){
-      setStatus("No matches found. Try a different spelling or search by table number.");
-      hideResults();
-      return;
-    }
+if (filtered.length === 0){
+setStatus("No matches found. Try a different spelling or search by table number.");
+hideResults();
+return;
+}
 
-    setStatus(`Showing ${filtered.length} result(s).`);
-    const html = filtered.map(r => `
-      <tr>
-        <td>${escapeHtml(r.Date)}</td>
-        <td>${escapeHtml(r.Table)}</td>
-        <td>${escapeHtml(r.Name)}</td>
-        <td>${escapeHtml(r.Starter)}</td>
-        <td>${escapeHtml(r.Main)}</td>
-        <td>${escapeHtml(r.Dessert)}</td>
-      </tr>
-    `).join("");
+setStatus(`Showing ${filtered.length} result(s).`);
+const html = filtered.map(r => `
+     <tr>
+       <td>${escapeHtml(r.Date)}</td>
+       <td>${escapeHtml(r.Table)}</td>
+       <td>${escapeHtml(r.Name)}</td>
+       <td>${escapeHtml(r.Starter)}</td>
+       <td>${escapeHtml(r.Main)}</td>
+       <td>${escapeHtml(r.Dessert)}</td>
+     </tr>
+   `).join("");
 
-    showResults(html);
-  }
+showResults(html);
+}
 
-  function clearAll(){
-    el("q").value = "";
-    el("date").value = "";
-    setStatus("Enter a name (2+ letters) or table number, then press Search.");
-    hideResults();
-  }
+function clearAll(){
+el("q").value = "";
+el("date").value = "";
+setStatus("Enter a name (2+ letters) or table number, then press Search.");
+hideResults();
+}
 
-  // Prevent HTML injection in case any cell has special characters
-  function escapeHtml(str){
-    return (str || "").toString()
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
-      .replaceAll("'","&#039;");
-  }
+// Prevent HTML injection in case any cell has special characters
+function escapeHtml(str){
+return (str || "").toString()
+.replaceAll("&","&amp;")
+.replaceAll("<","&lt;")
+.replaceAll(">","&gt;")
+.replaceAll('"',"&quot;")
+.replaceAll("'","&#039;");
+}
 
-  document.addEventListener("DOMContentLoaded", () => {
-    el("searchBtn").addEventListener("click", runSearch);
-    el("clearBtn").addEventListener("click", clearAll);
+document.addEventListener("DOMContentLoaded", () => {
+el("searchBtn").addEventListener("click", runSearch);
+el("clearBtn").addEventListener("click", clearAll);
 
-    // Enter key triggers search
-    el("q").addEventListener("keydown", (e) => {
-      if (e.key === "Enter") runSearch();
-    });
+// Enter key triggers search
+el("q").addEventListener("keydown", (e) => {
+if (e.key === "Enter") runSearch();
+});
 
-    // DO NOT auto-search on typing — keeps data hidden unless they explicitly search
-    loadCSV();
-  });
+// DO NOT auto-search on typing — keeps data hidden unless they explicitly search
+loadCSV();
+});
 </script>
 </body>
 </html>
