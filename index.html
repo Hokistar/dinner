@@ -61,11 +61,26 @@ font-size: 12px;
 color: var(--muted);
 }
 .hint{ margin-top: 10px; font-size: 12px; color: var(--muted); }
+    .brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 6px;
+}
+
+.brand img {
+  height: 38px;   /* adjust size if needed */
+  width: auto;
+  display: block;
+}
 </style>
 </head>
 
 <body>
-<h1>🍽️ Dinner Order Lookup</h1>
+<div class="brand">
+  <img src="costa-logo.png" alt="Costa Coffee logo" />
+  <h1>🍽️ Dinner Order Lookup</h1>
+</div>
 <p class="sub">Search by <b>name</b> (2+ letters) or <b>table number</b>. Results only appear after you press Search.</p>
 
 <div class="row">
